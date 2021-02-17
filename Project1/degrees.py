@@ -6,26 +6,28 @@ def getFacultyMembers(dURL):
     deptConnection = requests.get(dURL, headers={"User-Agent": "Mozilla/5.0"})
     deptParser = BeautifulSoup(deptConnection.content, "lxml")
     mInclude = "faculty_staff/bio"
+    pageImages = len(deptParser.findAll("img"))
+    # pageHeader = deptParser.find(class_="dept_link") In case you want the departments
 
-    # -----------------------------------------
-    # Works when the pages have no Images
-    # results = [i.get("href") for i in deptParser.find(class_="linkList").findAll("a")]
-    #
-    # for i in results:
-    #     print(str(i))
-    # -----------------------------------------
+    # DOES NOT WORK FOR NATIVE AMERICAN STUDIES, AND LATINO STUDIES PAGES
+    # Does not work with Native American Studies because the first category isn't the full time faculty
+    # Does not work with Latino studies pages because the wrapper class is not named linkList
 
-    # -----------------------------------------
-    # This part works when the full time faculty members are listed first (for pages with images)
-    results = [i.get("href") for i in deptParser.find(class_="units-row staff-groups").findAll("a") if mInclude in i.get("href")]
+    # Case where there are images for the faculty members
+    if "cinema_studies" in dURL:
+        print("In cinema studies")
+    elif pageImages > 3:
+        print("entered images")
+        results = set(i.get("href") for i in deptParser.find(class_="units-row staff-groups").findAll("a")
+                      if mInclude in i.get("href"))
+        return list(results)
 
-    results = set(results)
-    for i in results:
-        pass
-        print(i)
-    # -----------------------------------------
+    # Case where there are not images for the faculty members
+    elif pageImages == 3:
+        results = [i.get("href") for i in deptParser.find(class_="linkList").findAll("a")]
+        return results
 
-    return ""
+    return []
 
     # -----------------------------------------
     # This part is incomplete (for pages with images)
@@ -59,8 +61,10 @@ def main():
         faculty = []
         for i in departments:
             if not isinstance(i, NavigableString):
-                if("https" not in i.a['href'] and "africana" in i.a['href']):
-                    dURL = baseURL + i.a['href']
+                if "https" in i.a["href"]:
+                    faculty.append(getFacultyMembers(i.a["href"]))
+                elif("latino" not in i.a["href"]):
+                    dURL = baseURL + i.a["href"]
                     faculty.append(getFacultyMembers(dURL))
 
     except Exception as e:
