@@ -14,19 +14,12 @@ def getFacultyMembers(dURL):
     # Does not work with Native American Studies because the first category isn't the full time faculty
     # Does not work with Latino studies pages because the wrapper class is not named linkList
 
-    # Special case where for the cinema studies program
-    if "cinema_studies" in dURL:
-        facultyLink = [i.find("a").get("href") for i in deptParser.findAll(class_="first") if "cinema_studies" in i.find("a").get("href")]
-        cinemaLink = "https://www.umb.edu" + facultyLink[0]
-        cinemaConnection = requests.get(cinemaLink, headers={"User-Agent": "Mozilla/5.0"})
-        cinemaParser = BeautifulSoup(cinemaConnection.content, "lxml")
-        print(cinemaLink)
-        results = [i.find("a") for i in cinemaParser.findAll(class_="units-row")]
-
-        # Not done
-        
     # Case where there are images for the faculty members
+    if "cinema_studies" in dURL:
+        print("In cinema studies")
+        pass
     elif pageImages > 3:
+        print("entered images")
         results = set(i.get("href") for i in deptParser.find(class_="units-row staff-groups").findAll("a")
                       if mInclude in i.get("href"))
         return list(results)
@@ -35,9 +28,12 @@ def getFacultyMembers(dURL):
     elif pageImages == 3:
         results = [i.get("href") for i in deptParser.find(class_="linkList").findAll("a")]
         return results
-
+    
     return []
-
+    
+    
+    
+    
     # -----------------------------------------
     # This part is incomplete (for pages with images)
     # resultsImg = deptParser.findAll(class_="units-row staff-groups")
@@ -54,10 +50,8 @@ def getFacultyMembers(dURL):
     # s = set(s)
     # for i in s:
     #     print(i)
-
 def getIndPages():
-    newURL = ""
-    indConnection = requests.get(newURL, headers={"User-Agent": "Mozilla/5.0"})
+    indConnection = requests.get(, headers={"User-Agent": "Mozilla/5.0"})
 
 def main():
     try:
@@ -74,13 +68,12 @@ def main():
         faculty = []
         for i in departments:
             if not isinstance(i, NavigableString):
-                if "https" in i.a["href"] and "inema" in i.a["href"]:
+                if "https" in i.a["href"]:
                     faculty.append(getFacultyMembers(i.a["href"]))
                 elif("latino" not in i.a["href"]):
                     dURL = baseURL + i.a["href"]
                     faculty.append(getFacultyMembers(dURL))
-        
-        # Right now the results are chained and just being printed, set length = 270
+            
         chainedResults = set(itertools.chain.from_iterable(faculty))
         print (chainedResults)
 
