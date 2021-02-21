@@ -1,9 +1,8 @@
 from bs4 import BeautifulSoup, NavigableString
-from collections import Counter
 import requests
 import itertools
 
-def getFacultyMembers(dURL):
+def getFacultyMembers(dURL, program = "-1"):
     deptConnection = requests.get(dURL, headers={"User-Agent": "Mozilla/5.0"})
     deptParser = BeautifulSoup(deptConnection.content, "lxml")
     mInclude = "faculty_staff/bio"
@@ -15,16 +14,24 @@ def getFacultyMembers(dURL):
     # Does not work with Latino studies pages because the wrapper class is not named linkList
 
     # Special case where for the cinema studies program
-    if "cinema_studies" in dURL:
+    if program in dURL:
         facultyLink = [i.find("a").get("href") for i in deptParser.findAll(class_="first") if "cinema_studies" in i.find("a").get("href")]
         cinemaLink = "https://www.umb.edu" + facultyLink[0]
         cinemaConnection = requests.get(cinemaLink, headers={"User-Agent": "Mozilla/5.0"})
         cinemaParser = BeautifulSoup(cinemaConnection.content, "lxml")
-        print(cinemaLink)
-        results = [i.find("a") for i in cinemaParser.findAll(class_="units-row")]
-        print(results)
 
-        # Not done
+        results = [i for i in cinemaParser.findAll(class_="units-row staff-groups")]
+
+        # Sort by length
+        results.sort(key=len)
+
+        # The largest section will have the full-time faculty
+        results = results[len(results) - 1]
+
+        # Gets all the bios for each faculty member
+        results = set(i.get("href") for i in results.findAll("a") if mInclude in i.get("href"))
+
+        return list(results)
 
     # Case where there are images for the faculty members
     elif pageImages > 3:
@@ -75,15 +82,15 @@ def main():
         faculty = []
         for i in departments:
             if not isinstance(i, NavigableString):
-                if "https" in i.a["href"] and "inema" in i.a["href"]:
-                    faculty.append(getFacultyMembers(i.a["href"]))
+                if "https" in i.a["href"] and "cinema" in i.a["href"]:
+                    faculty.append(getFacultyMembers(i.a["href"], "cinema" ))
                 elif("latino" not in i.a["href"]):
                     dURL = baseURL + i.a["href"]
                     faculty.append(getFacultyMembers(dURL))
         
         # Right now the results are chained and just being printed, set length = 270
         chainedResults = set(itertools.chain.from_iterable(faculty))
-        print (chainedResults)
+        #print (chainedResults)
 
     except Exception as e:
         print(f"there was an error: {e})")
