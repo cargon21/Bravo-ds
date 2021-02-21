@@ -51,7 +51,8 @@ def getFacultyMembers(dURL):
     # for i in s:
     #     print(i)
 def getIndPages():
-    indConnection = requests.get(, headers={"User-Agent": "Mozilla/5.0"})
+    # indConnection = requests.get(, headers={"User-Agent": "Mozilla/5.0"})
+    return 0;
 
 def main():
     try:
@@ -75,7 +76,7 @@ def main():
                     faculty.append(getFacultyMembers(dURL))
             
         chainedResults = set(itertools.chain.from_iterable(faculty))
-        print (chainedResults)
+        print(chainedResults)
 
     except Exception as e:
         print(f"there was an error: {e})")

@@ -22,9 +22,10 @@ def getFacultyMembers(dURL):
         cinemaParser = BeautifulSoup(cinemaConnection.content, "lxml")
         print(cinemaLink)
         results = [i.find("a") for i in cinemaParser.findAll(class_="units-row")]
+        print(results)
 
         # Not done
-        
+
     # Case where there are images for the faculty members
     elif pageImages > 3:
         results = set(i.get("href") for i in deptParser.find(class_="units-row staff-groups").findAll("a")
