@@ -47,7 +47,7 @@ def getFacultyMembers(dURL, program = "-1"):
 
     # Case where there are not images for the faculty members
     elif pageImages == 3:
-        results = [i.get("href") for i in deptParser.find(class_="linkList").findAll("a")]
+        results = ["https://www.umb.edu" + i.get("href") for i in deptParser.find(class_="linkList").findAll("a")]
         return results
 
     return []
