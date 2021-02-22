@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup, NavigableString
-from collections import Counter
+import csv
 import requests
 import itertools
+import re
 
 def getFacultyMembers(dURL):
     deptConnection = requests.get(dURL, headers={"User-Agent": "Mozilla/5.0"})
@@ -14,26 +15,31 @@ def getFacultyMembers(dURL):
     # Does not work with Native American Studies because the first category isn't the full time faculty
     # Does not work with Latino studies pages because the wrapper class is not named linkList
 
-    # Case where there are images for the faculty members
+    # Special case where for the cinema studies program
     if "cinema_studies" in dURL:
-        print("In cinema studies")
-        pass
+        facultyLink = [i.find("a").get("href") for i in deptParser.findAll(class_="first") if "cinema_studies" in i.find("a").get("href")]
+        cinemaLink = "https://www.umb.edu" + facultyLink[0]
+        cinemaConnection = requests.get(cinemaLink, headers={"User-Agent": "Mozilla/5.0"})
+        cinemaParser = BeautifulSoup(cinemaConnection.content, "lxml")
+       # print(cinemaLink)
+        results = [i.find("a") for i in cinemaParser.findAll(class_="units-row")]
+       # print(results)
+
+        # Not done
+
+    # Case where there are images for the faculty members
     elif pageImages > 3:
-        print("entered images")
         results = set(i.get("href") for i in deptParser.find(class_="units-row staff-groups").findAll("a")
                       if mInclude in i.get("href"))
         return list(results)
 
     # Case where there are not images for the faculty members
     elif pageImages == 3:
-        results = [i.get("href") for i in deptParser.find(class_="linkList").findAll("a")]
+        results = ["https://www.umb.edu" + i.get("href") for i in deptParser.find(class_="linkList").findAll("a")]
         return results
-    
+
     return []
-    
-    
-    
-    
+
     # -----------------------------------------
     # This part is incomplete (for pages with images)
     # resultsImg = deptParser.findAll(class_="units-row staff-groups")
@@ -50,9 +56,31 @@ def getFacultyMembers(dURL):
     # s = set(s)
     # for i in s:
     #     print(i)
-def getIndPages():
-    # indConnection = requests.get(, headers={"User-Agent": "Mozilla/5.0"})
-    return 0;
+
+def regex():
+    pattern = re.compile(r'phd')
+
+def connection(URL):
+    baseURL = "https://www.umb.edu"
+    departmentsURL = "https://www.umb.edu/academics/cla/faculty"
+    connection = requests.get(URL, headers={"User-Agent": "Mozilla/5.0"})
+
+def csvFile():
+    with open("umbFaculty.csv", "w") as csvFileIn:
+        writer = csv.writer(csvFileIn, delimiter=',', quotechar='"')
+        writer.writerow('Degree Name', 'School Name') # write header
+        # write the rest of the file; each row is a list of strings or numbers
+        writer.writerows()
+
+def getBioPages(chainedResults):
+    newURL = chainedResults
+    bioConnection = requests.get(newURL, headers={"User-Agent": "Mozilla/5.0"})
+    bioParser = BeautifulSoup(bioConnection.content, "lxml")
+    degreesTag = [i for i in bioParser.findAll("h4") if i.get_text().strip() == "Degrees"]
+    
+    for i in degreesTag:
+        degreesList = [i.findNext("p").get_text().strip()]
+        print(degreesList, "\n")    
 
 def main():
     try:
@@ -69,14 +97,17 @@ def main():
         faculty = []
         for i in departments:
             if not isinstance(i, NavigableString):
-                if "https" in i.a["href"]:
+                if "https" in i.a["href"] and "inema" in i.a["href"]:
                     faculty.append(getFacultyMembers(i.a["href"]))
                 elif("latino" not in i.a["href"]):
                     dURL = baseURL + i.a["href"]
                     faculty.append(getFacultyMembers(dURL))
-            
-        chainedResults = set(itertools.chain.from_iterable(faculty))
-        print(chainedResults)
+        
+        # Right now the results are chained and just being printed, set length = 270
+        chainedResults = list(set(itertools.chain.from_iterable(faculty)))
+        # print (chainedResults)
+        for i in chainedResults:
+            getBioPages(i)
 
     except Exception as e:
         print(f"there was an error: {e})")

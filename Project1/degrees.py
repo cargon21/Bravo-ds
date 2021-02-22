@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup, NavigableString
 import requests
 import itertools
+import csv
+import re
 
 def getFacultyMembers(dURL, program = "-1"):
     deptConnection = requests.get(dURL, headers={"User-Agent": "Mozilla/5.0"})
@@ -19,6 +21,10 @@ def getFacultyMembers(dURL, program = "-1"):
         cinemaLink = "https://www.umb.edu" + facultyLink[0]
         cinemaConnection = requests.get(cinemaLink, headers={"User-Agent": "Mozilla/5.0"})
         cinemaParser = BeautifulSoup(cinemaConnection.content, "lxml")
+
+       # print(cinemaLink)
+        results = [i.find("a") for i in cinemaParser.findAll(class_="units-row")]
+       # print(results)
 
         results = [i for i in cinemaParser.findAll(class_="units-row staff-groups")]
 
@@ -62,10 +68,21 @@ def getFacultyMembers(dURL, program = "-1"):
     # s = set(s)
     # for i in s:
     #     print(i)
+    
+def csvFile():
+    with open("umbFaculty.csv", "w") as csvFileIn:
+        writer = csv.writer(csvFileIn, delimiter=',', quotechar='"')
+        writer.writerow('Degree Name', 'School Name') # write header
+        # write the rest of the file; each row is a list of strings or numbers
+        writer.writerows()
 
-def getIndPages():
-    newURL = ""
-    indConnection = requests.get(newURL, headers={"User-Agent": "Mozilla/5.0"})
+# This prints all the Degrees but the on garbage element is ['...']
+def getBioPages(chainedResults):
+   newURL = chainedResults
+   bioConnection = requests.get(newURL, headers={"User-Agent": "Mozilla/5.0"})
+   bioParser = BeautifulSoup(bioConnection.content, "lxml")
+    
+   for i in degreesTag:
 
 def main():
     try:
@@ -91,6 +108,10 @@ def main():
         # Right now the results are chained and just being printed, set length = 270
         chainedResults = set(itertools.chain.from_iterable(faculty))
         #print (chainedResults)
+        chainedResults = list(set(itertools.chain.from_iterable(faculty)))
+        
+        for i in chainedResults:
+            getBioPages(i)
 
     except Exception as e:
         print(f"there was an error: {e})")
