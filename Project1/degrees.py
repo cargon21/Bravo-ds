@@ -81,8 +81,11 @@ def getBioPages(chainedResults):
    newURL = chainedResults
    bioConnection = requests.get(newURL, headers={"User-Agent": "Mozilla/5.0"})
    bioParser = BeautifulSoup(bioConnection.content, "lxml")
+   degreesTag = [i for i in bioParser.findAll("h4") if i.get_text().strip() == "Degrees"]
     
    for i in degreesTag:
+       degreesList = [i.findNext("p").get_text().strip()]
+       print(degreesList, "\n")  
 
 def main():
     try:
