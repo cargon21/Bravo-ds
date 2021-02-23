@@ -51,23 +51,6 @@ def getFacultyMembers(dURL, program = "-1"):
         return results
 
     return []
-
-    # -----------------------------------------
-    # This part is incomplete (for pages with images)
-    # resultsImg = deptParser.findAll(class_="units-row staff-groups")
-    #
-    # s = []
-    # for i in resultsImg:
-    #     i = i.findAll("a")
-    # for i in resultsImg:
-    #     i = i.findAll("a")
-    #     #print(len(i))
-    #     for j in i:
-    #         if mInclude in j.get("href") and len(i) > 16:
-    #             s.append(j.get("href"))
-    # s = set(s)
-    # for i in s:
-    #     print(i)
     
 def csvFile():
     with open("umbFaculty.csv", "w") as csvFileIn:
@@ -89,24 +72,23 @@ def getBioPages(chainedResults):
 
    return degrees
 
-# returns a dictionary with the Degree name and University name
-def getData(data):
+def getData(data):      # returns a dictionary with the Degree name and University name
     deg = r"PhD|BA|BFA|MFA|MM|MA|MS|DPhil|AB|MUPP|MEd|MNEd|JD|LCSW|ABD|MPhil|BS|Juris Doctor|MA/MPhil"
     patterns = r"\s*(PhD|BA|BFA|MFA|MM|MA|MS|DPhil|AB|MUPP|MEd|MNEd|JD|LCSW|ABD|MPhil|BS|Juris Doctor|MA/MPhil)\s*|\d+|(University of \w+, \w+)|\(|\)|,|(College of \w*)"
     uni = r"\s*University|College|UMass|MIT|London School|New School"
     m = []
 
-    if "," not in data[0]:
-        m = re.split(patterns, data[0])
-        m = [re.sub(",", "", i.strip()) for i in m if i and (re.search(uni, i) or re.search(deg, i))]
+    # if "," not in data[0]:          # decided to split the data into items with commas and without commas
+    m = re.split(patterns, data[0])
+    m = [re.sub(",", "", i.strip()) for i in m if i and (re.search(uni, i) or re.search(deg, i))]
 
-    else:
-        m = re.split(patterns, data[0])
-        m = [re.sub(",", "", i.strip()) for i in m if i and (re.search(uni, i) or re.search(deg, i))]
+    # else:
+    #     m = re.split(patterns, data[0])
+    #     m = [re.sub(",", "", i.strip()) for i in m if i and (re.search(uni, i) or re.search(deg, i))]
 
     return m
 
-def getDictionary(li):
+def getDictionary(li):  # We determined the easiest way to write into a csv file with the data we had was with a dictionary
     final = []
 
     for i in li:
@@ -139,28 +121,28 @@ def main():
 
         result2 = parser.findAll("ul")
 
-        departments = [tag for tag in result2[5]]
+        departments = [tag for tag in result2[5]]  # the 5th 'ul' tag was the dept name
 
         faculty = []
         for i in departments:
-            if not isinstance(i, NavigableString):
+            if not isinstance(i, NavigableString):                      # edge case for the cinema studies page (different format)
                 if "https" in i.a["href"] and "cinema" in i.a["href"]:
                     faculty.append(getFacultyMembers(i.a["href"], "cinema" ))
                 elif("latino" not in i.a["href"]):
                     dURL = baseURL + i.a["href"]
                     faculty.append(getFacultyMembers(dURL))
         
-        # Right now the results are chained and just being printed, set length = 270
-        chainedResults = set(itertools.chain.from_iterable(faculty))
-        #print (chainedResults)
-        chainedResults = list(set(itertools.chain.from_iterable(faculty)))
+        
+        chainedResults = set(itertools.chain.from_iterable(faculty))    # took all of the faculty links and linked them together, and removed duplicates
+        
+        chainedResults = list(set(itertools.chain.from_iterable(faculty)))  # needed them as a list so we could iterate over the items
 
-        chainedResults = [getBioPages(i) for i in chainedResults if len(getBioPages(i)) >= 1]
+        chainedResults = [getBioPages(i) for i in chainedResults if len(getBioPages(i)) >= 1]   # getBioPages was returning empty lists hence the >= 1
 
         data = []
         for i in chainedResults:
-            if len(i[0]) > 3 and len(getData(i)) % 2 == 0:
-                temp = getData(i)
+            if len(i[0]) > 3 and len(getData(i)) % 2 == 0:  # used % 2 to eliminate the values which had two consecutive degrees and then the school
+                temp = getData(i)                           # this eliminated edge cases that would have add alot of time
                 if len(temp) > 2:
                     for j in range(0, (len(temp) - 1), 2):
                         data.append([temp[j], temp[j+1]])
