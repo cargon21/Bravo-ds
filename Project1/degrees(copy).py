@@ -97,7 +97,7 @@ def getBioPages(chainedResults):
 # returns a dictionary with the Degree name and University name
 def getData(data):
     deg = r"PhD|BA|BFA|MFA|MM|MA|MS|DPhil|AB|MUPP|MEd|MNEd|JD|LCSW|ABD|MPhil|BS|Juris Doctor|MA/MPhil"
-    patterns = r"\s*(PhD|BA|BFA|MFA|MM|MA|MS|DPhil|AB|MUPP|MEd|MNEd|JD|LCSW|ABD|MPhil|BS|Juris Doctor|MA/MPhil)\s*|\d+|(University of \w+, \w+)|\(|\)|,|(College of \w*)"
+    patterns = r"\s*(PhD|MA|BA|BFA|MFA|MM|MA|MS|DPhil|AB|MUPP|MEd|MNEd|JD|LCSW|ABD|Juris Doctor)\s*|\d+|(University of [a-z]+, [a-z]+)|\(|\)|,"
     uni = r"\s*University|College|UMass|MIT|London School|New School"
     m = []
 
@@ -165,7 +165,7 @@ def main():
 
         bigStr = ""
         for i in chainedResults:
-            if len(i[0] > 3) and len(getData(i)) % 2 == 0:
+            if len(i[0]) > 3 and len(getData(i)) % 2 == 0:
                 bigStr += str(i) + ","
 
         print(bigStr)
