@@ -5,7 +5,7 @@
 
 # Game plan: 1) Load JSON file (small set), final run will have all reviews
 #            2) Extract all review text and star ratings
-#            3) Break each review into indivisuals words using NLTK
+#            3) Break each review into individuals words using NLTK
 #            4) Lemmatize the words
 #            5) Filter out stop words and words that are not in the words corpus
 #            6) For each lemma calculate its star rating, if lemma is used in less than 10 reviews discard it
@@ -18,3 +18,20 @@ import nltk
 from collections import Counter
 from nltk.corpus import stopwords
 from nltk.corpus import words
+
+# open sing json
+with open ("../../yelp_academic_dataset_review_small.json") as yelpFile:
+    yelpData = json.load(yelpFile)
+    
+    idx = 0
+    for i in yelpData:
+        print(i)
+        idx += 1
+        if idx == 100:
+            break
+
+reviews_ratings = [[review['stars'], review['text']] for review in yelpData]
+
+# len([word for word in tokens if word not in set(stopwords.words('english')) and word.isalnum()])
+
+wnl = nltk.WordNetLemmatizer()
