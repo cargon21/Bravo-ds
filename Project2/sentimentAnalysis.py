@@ -21,17 +21,46 @@ from nltk.corpus import words
 
 # open sing json
 with open ("../../yelp_academic_dataset_review_small.json") as yelpFile:
-    yelpData = json.load(yelpFile)
-    
-    idx = 0
-    for i in yelpData:
-        print(i)
-        idx += 1
-        if idx == 100:
-            break
+    real_yelp_data = json.load(yelpFile)
 
-reviews_ratings = [[review['stars'], review['text']] for review in yelpData]
+# create some sample yelp data to experiment on
+yelp_data = []
+index = 0
+for i in real_yelp_data:
+    if index > 3:
+        break
+    yelp_data.append(i)
+    index+= 1
+
+
+wnl = nltk.WordNetLemmatizer()
+reviews_ratings = []
+
+for review in yelp_data:
+    tokenize = nltk.word_tokenize(review['text'])
+    
+    lemmatize = [wnl.lemmatize(w) for w in tokenize]
+            
+    filter_words = [i for i in lemmatize if i not in set(stopwords.words('english')) and i.isalnum()]
+    
+    reviews_ratings.append([review['stars'], filter_words])
+    
+    
+    
+    
+    
+# reviews_ratings = [[review['stars'], nltk.word_tokenize(review['text'])] for review in yelp_data]
+
+# wnl = nltk.WordNetLemmatizer()
+
+
 
 # len([word for word in tokens if word not in set(stopwords.words('english')) and word.isalnum()])
 
-wnl = nltk.WordNetLemmatizer()
+# wnl = nltk.WordNetLemmatizer()
+
+# a = reviews_ratings[0][1]
+# li = [wnl.lemmatize(w) for w in a]
+
+# for i in range(150): 
+#     print(a[i] + " ---- " + li[i], str(a[i] == li[i]))
