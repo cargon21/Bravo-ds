@@ -32,7 +32,7 @@ reviews_ratings = {}
 
 for review in yelp_data:
     
-    # Lammatize each review
+    # Lemmatize each review
     lemmatize = [wnl.lemmatize(w) for w in nltk.word_tokenize(review['text'].lower())]
     
     # Filter the review
@@ -55,6 +55,7 @@ final = list(sorted(reviews_ratings.items(), key=lambda item: item[1], reverse =
 
 file_name = "reviews.csv"
 
+#DZ: You have extra line breaks at the end of each line.
 # Open and write to the CSV file
 with open(file_name, 'w') as csvfile:
        writer = csv.writer(csvfile)
