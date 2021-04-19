@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot  as plt 
 
 def timestamp():
+    to_days = (1000*60*60*24)
     days = (
         max(users["memberSince"].max(), messages["sendDate"].max(), discussions["createDate"].max(), discussion_posts["createDate"].max()) - 
     
@@ -16,7 +17,6 @@ messages = pd.read_csv('traders/messages.tsv', sep="\t")
 discussions = pd.read_csv('traders/discussions.tsv', sep="\t")
 discussion_posts = pd.read_csv('traders/discussion_posts.tsv', sep="\t")
 
-to_days = (1000*60*60*24)
 
 # If we need to convert each column to days right at the start
 # users["memberSince"] = users["memberSince"] / to_milliseconds
@@ -30,8 +30,24 @@ print(f"The estimated time span of the database is: {timestamp()} days")
 
 print(f"The estimated time span of the database is: {len(discussions)} days")
 
-message_sizes = [len(users["memberSince"]), len(messages["sendDate"]), len(discussions["createDate"]), len(discussion_posts["createDate"])]
+plot1 = plt.figure(1)
+m_plot = plt.pie(messages.groupby("type").size())
 
-plt.pie(message_sizes)
+plot2 = plt.figure(2)
+d_plot = plt.pie(discussions.groupby("discussionCategory").size())
+
+print(f"The number of discussion posts: {discussion_posts['id'].sum()}")
+
+plot3 = plt.figure(3)
+h_plot = plt.hist(messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sendDate.min(), 8, normed=1)
+
+
+a = messages.merge(users.groupby("memberSince").min()) # attempt on 3
 
 plt.show()
+
+messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sendDate.min()
+
+
+
+
