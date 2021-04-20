@@ -39,10 +39,14 @@ d_plot = plt.pie(discussions.groupby("discussionCategory").size())
 print(f"The number of discussion posts: {discussion_posts['id'].sum()}")
 
 plot3 = plt.figure(3)
-h_plot = plt.hist(messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sendDate.min(), 8, normed=1)
+h_plot = plt.hist( messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sendDate.min(), 8)
+
+a = pd.merge(users, messages.groupby(["sender_id", "type"]).min(), left_on="id", right_on='sender_id') # attempt on 3
+b = pd.merge(users, messages, left_on="id", right_on='sender_id').groupby(["sender_id", "type"]).min() # attempt on 3
+
+b["delay"] = b["sendDate"] - b["memberSince"]
 
 
-a = messages.merge(users.groupby("memberSince").min()) # attempt on 3
 
 plt.show()
 
