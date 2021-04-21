@@ -1,3 +1,30 @@
+# All files are TAB-separated. All times in the tables are expressed in milliseconds, starting on midnight, January 1, 1970. You shall convert the times to days (24hr).
+
+# You shall produce the following deliverables:
+    # Simple descriptive statistics:
+    # 1. How many users are in the database? 
+        # Deliverable: A number. 
+    # 2. What is the time span of the database? 
+        # Deliverable: The difference between the largest and the smallest timestamps in the database, a number. 
+    # 3. How many messages of each type have been sent? 
+        # Deliverable: A pie chart. 
+    # 4. How many discussions of each type have been started? 
+        # Deliverable: A pie chart. 
+    # 5. How many discussion posts have been posted? 
+        # Deliverable: A number.
+    # 6. Activity range is the time between the first and the last message (in ANY category) sent by the same user. 
+    # 7. What is the distribution of activity ranges? 
+        # Deliverable: a histogram. 
+    # 8. Message activity delay is the time between user account creation and sending the first user message in a specific category. What is the distribution of message activity delays in EACH category? 
+        # Deliverable: a histogram for each category (ideally all histograms shall be in the same chart, semi-transparent, with legend).
+    # What is the distribution of discussion categories by the number of posts? What is the most popular category? 
+        # Deliverable: a pie chart, with the most popular category highlighted.
+    # Post activity delay is the time between user account creation and posting the first discussion message. What is the distribution of post activity delays in the most popular category? 
+        # Deliverable: a histogram. Note: The most popular category shall be carried over from the previous question.
+    # A box plot with whiskers that shows all appropriate statistics for message activity delays in EACH category, post activity delays, and activity ranges.
+    # Finally, you shall write a short report that summarizes your findings in plain English language (for someone who knows neither CS nor Stats).
+    # You shall be able to produce all deliverables in one program by applying appropriate transformations to one  DataFrame, assembled from the four tabular files (however, two- and three-way merges shall work, too).  The Y axis of all histograms shall be on the logarithmic scale.
+
 import pandas as pd
 import matplotlib.pyplot  as plt 
 
