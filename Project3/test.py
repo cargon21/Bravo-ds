@@ -17,9 +17,9 @@
         # Deliverable: a histogram. 
     # 8. Message activity delay is the time between user account creation and sending the first user message in a specific category. What is the distribution of message activity delays in EACH category? 
         # Deliverable: a histogram for each category (ideally all histograms shall be in the same chart, semi-transparent, with legend).
-    # What is the distribution of discussion categories by the number of posts? What is the most popular category? 
+    # 9. What is the distribution of discussion categories by the number of posts? What is the most popular category? 
         # Deliverable: a pie chart, with the most popular category highlighted.
-    # Post activity delay is the time between user account creation and posting the first discussion message. What is the distribution of post activity delays in the most popular category? 
+    # 10. Post activity delay is the time between user account creation and posting the first discussion message. What is the distribution of post activity delays in the most popular category? 
         # Deliverable: a histogram. Note: The most popular category shall be carried over from the previous question.
     # A box plot with whiskers that shows all appropriate statistics for message activity delays in EACH category, post activity delays, and activity ranges.
     # Finally, you shall write a short report that summarizes your findings in plain English language (for someone who knows neither CS nor Stats).
@@ -48,19 +48,19 @@ discussions = pd.read_csv('traders/discussions.tsv', sep="\t")
 discussion_posts = pd.read_csv('traders/discussion_posts.tsv', sep="\t")
 
 
-# Deliverables
+# Deliverables (number of users, time span of the data base)
 print(f"The number of users in the database is: {len(users)}")
 
 print(f"The estimated time span of the database is: {timestamp()} days")
 
 print(f"The estimated time span of the database is: {len(discussions)} days")
 
-# Plots the size of each type
+# Pie chart of message type
 plot1 = plt.figure(1)
 plt.pie(messages.groupby("type").size(), labels=("Friend Link Request","Direct Message"))
 plt.title("Messages Based on Type")
 
-
+# Pie chart of message range
 plot2 = plt.figure(2) # figsize=(20,8)
 plt.pie(discussions.groupby("discussionCategory").size().sort_values(0))
 plt.title("Message Range")
@@ -68,18 +68,21 @@ plt.legend(discussions.groupby("discussionCategory").size().sort_values(0).index
 
 print(f"The number of discussion posts: {discussion_posts['id'].sum()}")
 
-
+# Message range; difference between first and last message
 plot3 = plt.figure(3)
 plt.hist( (messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sendDate.min()) //86400000, 10, log=True )
 plt.title("Message Range")
 plt.xlabel("Activity Range (in days)")
 plt.ylabel("Number of Users")
 
+# merge data frames
 a = pd.merge(users, messages.groupby(["type", "sender_id"]).min(), left_on="id", right_on='sender_id') # attempt on 3
 b = (pd.merge(users, messages, left_on="id", right_on='sender_id').groupby(["type", "sender_id"]).min()).reset_index()# attempt on 3
 
+# Difference between account creation and activity
 b["delay"] = (b["sendDate"] - b["memberSince"]) // 86400000
 
+# Plot friend link request and direct message delay
 plot = plt.figure(4)
 to_plot = [b[b["type"]== "FRIEND_LINK_REQUEST"]["delay"], b[b["type"]== "DIRECT_MESSAGE"]["delay"]]
 plt.hist(to_plot, color = ["red", "skyblue"], log=True)
