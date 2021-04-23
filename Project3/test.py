@@ -68,48 +68,48 @@ plt.legend(discussions.groupby("discussionCategory").size().sort_values(0).index
 
 print(f"The number of discussion posts: {discussion_posts['id'].sum()}")
 
-# Message range; difference between first and last message
+# Difference between first and last message
 plot3 = plt.figure(3)
 plt.hist( (messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sendDate.min()) //86400000, 10, log=True )
 plt.title("Message Range")
 plt.xlabel("Activity Range (in days)")
 plt.ylabel("Number of Users")
 
-# merge data frames
-a = pd.merge(users, messages.groupby(["type", "sender_id"]).min(), left_on="id", right_on='sender_id') # attempt on 3
-b = (pd.merge(users, messages, left_on="id", right_on='sender_id').groupby(["type", "sender_id"]).min()).reset_index()# attempt on 3
+# Merging message and user data
+activity_range = (pd.merge(users, messages, left_on="id", right_on='sender_id').groupby(["type", "sender_id"]).min()).reset_index() # attempt on 3
 
 # Difference between account creation and activity
-b["delay"] = (b["sendDate"] - b["memberSince"]) // 86400000
+activity_range["delay"] = (activity_range["sendDate"] - activity_range["memberSince"]) // 86400000
 
 # Plot friend link request and direct message delay
-plot = plt.figure(4)
-to_plot = [b[b["type"]== "FRIEND_LINK_REQUEST"]["delay"], b[b["type"]== "DIRECT_MESSAGE"]["delay"]]
+plot4 = plt.figure(4)
+to_plot = [activity_range[activity_range["type"]== "FRIEND_LINK_REQUEST"]["delay"], activity_range[activity_range["type"]== "DIRECT_MESSAGE"]["delay"]]
 plt.hist(to_plot, color = ["red", "skyblue"], log=True)
 plt.title("Delay Times")
 plt.xlabel("Delay Time (in days)")
 plt.ylabel("Number of Users")
 plt.legend(["Friend Link Request", "Direct Message"])
 
+# Discussion categories
+plot5 = plt.figure(5)
+posts_w_category = pd.merge(discussion_posts, discussions, left_on= 'discussion_id', right_on= 'id').groupby('discussionCategory').size()
+explode = [0] * len(posts_w_category)
+explode[-1] = 0.1
+plt.pie(posts_w_category.sort_values(), explode = tuple(explode))
+plt.legend(posts_w_category.sort_values().index)
 
+# Ativity delay in most popular category
+most_pop = posts_w_category.sort_values().index[-1]
 
 
 # plt.hist(b[b["type"]== "FRIEND_LINK_REQUEST"]["delay"], color = "red", log=True)
 # plt.hist(b[b["type"]== "DIRECT_MESSAGE"]["delay"], color = "skyblue", log=True)
 
-
-
 # delay_plot = plt.hist(b["delay"], b["delay"])
 
 
 
-
-
-plt.show()
-
-messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sendDate.min()
-
-
+# messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sendDate.min()
 
 
 # If we need to convert each column to days right at the start
@@ -118,3 +118,4 @@ messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sen
 # discussions["createDate"] = discussions["createDate"] / to_milliseconds
 # discussion_posts["createDate"] = discussion_posts["createDate"] / to_milliseconds
 
+plt.show()

@@ -68,7 +68,7 @@ plt.legend(discussions.groupby("discussionCategory").size().sort_values(0).index
 
 print(f"The number of discussion posts: {discussion_posts['id'].sum()}")
 
-# Message range; difference between first and last message
+# Difference between first and last message
 plot3 = plt.figure(3)
 plt.hist( (messages.groupby("sender_id").sendDate.max() - messages.groupby("sender_id").sendDate.min()) //86400000, 10, log=True )
 plt.title("Message Range")
