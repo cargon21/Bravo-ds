@@ -58,12 +58,12 @@ print(f"The number of discussion posts is: {len(discussion_posts)} days")
 
 # Pie chart of message type
 plot1 = plt.figure(1, figsize=(8,8))
-plt.pie(messages.groupby("type").size(), labels=("Friend Link Request","Direct Message"))
+plt.pie(messages.groupby("type").size(), labels=("Friend Link Request","Direct Message"), autopct='%1.1f%%')
 plt.title("Messages Based on Type")
 
 # Pie chart of message range
 plot2 = plt.figure(2, figsize=(8,8)) # figsize=(20,8)
-plt.pie(discussions.groupby("discussionCategory").size().sort_values(0))
+plt.pie(discussions.groupby("discussionCategory").size().sort_values(0), autopct='%1.1f%%')
 plt.title("Message Range")
 plt.legend(discussions.groupby("discussionCategory").size().sort_values(0).index)
 
@@ -100,7 +100,8 @@ plot5 = plt.figure(5, figsize=(8,8))
 posts_w_category = pd.merge(discussion_posts, discussions, left_on= 'discussion_id', right_on= 'id').groupby('discussionCategory').size()
 explode = [0] * len(posts_w_category) # Create a list for the pie chart so we can set the most popular value
 explode[-1] = 0.1 # Initialize the most popular value to highlight
-plt.pie(posts_w_category.sort_values(), explode = tuple(explode))
+plt.pie(posts_w_category.sort_values(), explode = tuple(explode), autopct='%1.1f%%')
+plt.title("Discussion Categories by Numer of Posts")
 plt.legend(posts_w_category.sort_values().index)
 
 
